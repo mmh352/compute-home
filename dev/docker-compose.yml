@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  postgresql:
+    image: postgres:14.2-bullseye
+    environment:
+      POSTGRES_USER: ch
+      POSTGRES_PASSWORD: yahmunguaMiep0ie
+      POSTGRES_DB: ch
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+volumes:
+  postgresql:
