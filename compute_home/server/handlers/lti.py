@@ -7,9 +7,11 @@ from pylti1p3.oidc_login import OIDCLogin as LTILogin
 from pylti1p3.request import Request as LTIRequest
 from pylti1p3.session import SessionService as LTISessionService
 from pylti1p3.tool_config import ToolConfDict
+from sqlalchemy.future import select
 from tornado.web import RequestHandler, HTTPError
 
 from ..session import SessionMixin, Session
+from ...models import get_sessionmaker, User
 from ...utils import config
 
 logger = logging.getLogger(__name__)
@@ -194,7 +196,7 @@ class LtiLoginStartHandler(RequestHandler, SessionMixin):
 class LtiLaunchHandler(RequestHandler, SessionMixin):
     """Request handler for handling the launch request after authentication is successful."""
 
-    def post(self: 'LtiLaunchHandler') -> None:
+    async def post(self: 'LtiLaunchHandler') -> None:
         """Handle the POST request that completes the login proces."""
         logger.debug('Starting the LTI launch process')
         tool_config = ToolConfDict(generate_config())
@@ -206,10 +208,24 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
         )
         logger.debug('LTI launch validated - logging in')
         message_launch.get_launch_data()
-        # data = message_launch.get_launch_data()
-        # for key, value in data.items():
-        #     print(key, value)
+        data = message_launch.get_launch_data()
+        logger.debug(data)
+        logger.debug('Logging in user')
+        async with get_sessionmaker()() as session:
+            stmt = select(User).filter(User.external_id == str(data['sub']))
+            result = await session.execute(stmt)
+            user = result.scalars().first()
+            if user is None:
+                logger.debug('Creating a new user')
+                user = User(external_id=str(data['sub']), attributes={})
+                session.add(user)
+                await session.commit()
+            user.attributes['name'] = str(data['name'])
+            session.add(user)
+            await session.commit()
         self.session.clear()
+        self.session['user_id'] = user.id
+        self.redirect('/app')
 
     def check_xsrf_cookie(self: 'LtiLaunchHandler') -> None:
         """Check the XSRF state parameter."""
