@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from typing import Callable
 
 from .meta import MetaData, Base  # noqa
+from .user import User # noqa
 from ..utils import config
 
 logger = logging.getLogger(__name__)
