@@ -17,9 +17,9 @@ debug: True
 logging:
   version: 1
   loggers:
-    toja:
+    compute_home:
       level: DEBUG
-      qualname: toja
+      qualname: compute_home
       handlers:
         - console
   formatters:

@@ -19,7 +19,7 @@ def generate_config() -> dict:
     """Generate the configuration dictionary for the configured LTI platforms.
 
     :return: The configuration dictionary for the LTI library.
-    :return_type: dict
+    :rtype: dict
     """
     return dict([(entry['iss'], entry) for entry in config()['lti']])
 
@@ -41,7 +41,7 @@ class TornadoLTIRequest(LTIRequest):
         :param key: The key of the request parameter
         :type key: str
         :return: The value for the request parameter
-        :return_type: str
+        :rtype: str
         """
         return self._handler.get_argument(key)
 
@@ -57,7 +57,7 @@ class TornadoLTIRequest(LTIRequest):
         """Get the session for the request.
 
         :return: The current session.
-        :return_type: :class:`~compute_home_server.session.Session`
+        :rtype: :class:`~compute_home_server.session.Session`
         """
         return self._handler.session
 
@@ -92,7 +92,7 @@ class TornadoLTICookieService(LTICookieService):
         :param name: The name of the cookie to get.
         :type name: str
         :return: The value of the cookie
-        :return_type: str
+        :rtype: str
         """
         return self._handler.get_secure_cookie(name).decode('utf-8')
 
@@ -137,7 +137,7 @@ class TornadoLTILogin(LTILogin):
         :param url: The URL to redirect to.
         :type url: str
         :return: The redirection proxy.
-        :return_type: :class:`~compute_home.server.handlers.lti.TornadoLTIRedirect`
+        :rtype: :class:`~compute_home.server.handlers.lti.TornadoLTIRedirect`
         """
         return TornadoLTIRedirect(self._request._handler, url)
 
@@ -163,7 +163,7 @@ class TornadoLTIMessageLaunch(LTIMessageLaunch):
         :param key: The key of the request parameter to fetch.
         :type key: str
         :return: The request parameter value.
-        :return_type: str
+        :rtype: str
         """
         return self._request.get_param(key)
 
@@ -173,6 +173,7 @@ class LtiLoginStartHandler(RequestHandler, SessionMixin):
 
     def post(self: 'LtiLoginStartHandler') -> None:
         """Handle the POST request that starts the login process."""
+        logger.debug('Starting the LTI login process')
         self.session.clear()
         oidc_request = TornadoLTIRequest(self)
         oidc_login = TornadoLTILogin(
@@ -182,7 +183,7 @@ class LtiLoginStartHandler(RequestHandler, SessionMixin):
         )
         oidc_login.pass_params_to_launch({'xsrf': self.xsrf_token.decode('utf-8')})
         self.session['xsrf'] = self.xsrf_token.decode('utf-8')
-
+        logger.debug('Redirecting to the LTI platform')
         return oidc_login.redirect(self.get_argument('target_link_uri'))
 
     def check_xsrf_cookie(self: 'LtiLoginStartHandler') -> None:
@@ -195,6 +196,7 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
 
     def post(self: 'LtiLaunchHandler') -> None:
         """Handle the POST request that completes the login proces."""
+        logger.debug('Starting the LTI launch process')
         tool_config = ToolConfDict(generate_config())
         oidc_request = TornadoLTIRequest(self)
         message_launch = TornadoLTIMessageLaunch(
@@ -202,6 +204,7 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
             tool_config=tool_config,
             cookie_service=TornadoLTICookieService(self),
         )
+        logger.debug('LTI launch validated - logging in')
         message_launch.get_launch_data()
         # data = message_launch.get_launch_data()
         # for key, value in data.items():
