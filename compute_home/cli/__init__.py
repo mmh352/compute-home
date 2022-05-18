@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 CONFIG_SCHEMA = {
     'server': {
         'type': 'dict',
+        'required': True,
         'schema': {
             'host': {
                 'type': 'string',
@@ -30,13 +31,31 @@ CONFIG_SCHEMA = {
             'base': {
                 'type': 'string',
                 'default': 'http://127.0.0.1:6543'
+            },
+            'cookie_secret': {
+                'type': 'string',
+                'required': True,
+                'empty': False,
+            },
+            'session': {
+                'type': 'dict',
+                'schema': {
+                    'name': {
+                        'type': 'string',
+                        'empty': False,
+                        'default': 'compute_home_session'
+                    },
+                    'validity_days': {
+                        'type': 'integer',
+                        'default': 14
+                    }
+                },
+                'default': {
+                    'name': 'compute_home_session',
+                    'validity_days': 14
+                }
             }
         },
-        'default': {
-            'host': '127.0.0.1',
-            'port': 6543,
-            'base': 'http://127.0.0.1:6543'
-        }
     },
     'database': {
         'type': 'dict',
@@ -46,6 +65,59 @@ CONFIG_SCHEMA = {
                 'type': 'string',
                 'required': True,
             },
+        }
+    },
+    'lti': {
+        'type': 'list',
+        'required': True,
+        'minlength': 1,
+        'schema': {
+            'type': 'dict',
+            'required': True,
+            'schema': {
+                'iss': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'client_id': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'auth_login_url': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'auth_token_url': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'key_set_url': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'private_key_file': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'public_key_file': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'deployment_ids': {
+                    'type': 'list',
+                    'minlength': 1,
+                    'schema': {
+                        'type': 'string'
+                    }
+                }
+            }
         }
     },
     'debug': {

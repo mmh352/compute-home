@@ -2,6 +2,17 @@ database:
   dsn: postgresql+asyncpg://ch:yahmunguaMiep0ie@127.0.0.1:5432/ch
 server:
   host: '0.0.0.0'
+  cookie_secret: ohqu6aegezie9uuChidf9shuisahsiegiej4Quo9aiK3Ohhe8aisoimig4Bee9Eb
+lti:
+  - iss: http://localhost:8080
+    client_id: CimhZyC7XXJDfYo
+    auth_login_url: http://localhost:8080/mod/lti/auth.php
+    auth_token_url: http://localhost:8080/mod/lti/token.php
+    key_set_url: http://localhost:8080/mod/lti/certs.php
+    private_key_file: private.pem
+    public_key_file: public.pem
+    deployment_ids:
+      - '2'
 debug: True
 logging:
   version: 1
