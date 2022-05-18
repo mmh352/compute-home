@@ -1,5 +1,5 @@
 """ComputeHome command-line application."""
-# import asyncio
+import asyncio
 import click
 import logging
 import logging.config
@@ -9,6 +9,7 @@ import os
 from cerberus import Validator
 from typing import Union
 
+from .setup import setup_database
 from ..server import run_application_server
 from ..utils import set_config
 
@@ -189,7 +190,7 @@ main.add_command(server)
 @click.command()
 def setup() -> None:
     """Set up the Compute Home system."""
-    # asyncio.run(setup_backend())
+    asyncio.run(setup_database())
 
 
 main.add_command(setup)
