@@ -218,5 +218,5 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
             cookie_service=TornadoLTICookieService(self),
         )
         params = message_launch.get_params_from_login()
-        if 'xsrf' not in params or params['xsrf'] != self.session['xsrf']:
+        if params is None or 'xsrf' not in params or params['xsrf'] != self.session['xsrf']:
             raise HTTPError(status_code=403, log_message='XSRF validation failed')
