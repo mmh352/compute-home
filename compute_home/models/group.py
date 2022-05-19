@@ -1,4 +1,4 @@
-"""The User database model."""
+"""The Group database model."""
 from sqlalchemy import Column, Integer, Unicode
 from sqlalchemy.orm import relationship
 from sqlalchemy_json import NestedMutableJson
@@ -7,22 +7,18 @@ from .meta import Base
 from .users_groups import users_groups
 
 
-class User(Base):
-    """Model representing a single user in the database.
+class Group(Base):
+    """Model representing a single group in the database.
 
-    Attributes:
     * id - The unique database id
     * external_id - The external id provided by the LTI authentication
     * attributes - JSON dictionary containing the user's attributes
-
-    Relationships:
-    * groups - The groups this user belongs to
     """
 
-    __tablename__ = 'users'
+    __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True)
     external_id = Column(Unicode(255))
     attributes = Column(NestedMutableJson)
 
-    groups = relationship('Group', secondary=users_groups, back_populates='users')
+    users = relationship('User', secondary=users_groups, back_populates='groups')

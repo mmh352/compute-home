@@ -8,10 +8,11 @@ from pylti1p3.request import Request as LTIRequest
 from pylti1p3.session import SessionService as LTISessionService
 from pylti1p3.tool_config import ToolConfDict
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from tornado.web import RequestHandler, HTTPError
 
 from ..session import SessionMixin, Session
-from ...models import get_sessionmaker, User
+from ...models import get_sessionmaker, User, Group
 from ...utils import config
 
 logger = logging.getLogger(__name__)
@@ -212,7 +213,8 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
         logger.debug(data)
         logger.debug('Logging in user')
         async with get_sessionmaker()() as session:
-            stmt = select(User).filter(User.external_id == str(data['sub']))
+            # Find or create the user to log in
+            stmt = select(User).options(selectinload(User.groups)).filter(User.external_id == str(data['sub']))
             result = await session.execute(stmt)
             user = result.scalars().first()
             if user is None:
@@ -221,6 +223,22 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
                 session.add(user)
                 await session.commit()
             user.attributes['name'] = str(data['name'])
+            # Find or create the group the user belongs to
+            group_found = False
+            external_group_id = str(data['https://purl.imsglobal.org/spec/lti/claim/context']['id'])
+            for user_group in user.groups:
+                if user_group.external_id == external_group_id:
+                    group_found = True
+            if not group_found:
+                stmt = select(Group).filter(Group.external_id == external_group_id)
+                result = await session.execute(stmt)
+                group = result.scalars().first()
+                if group is None:
+                    group = Group(external_id=external_group_id, attributes={
+                        'label': str(data['https://purl.imsglobal.org/spec/lti/claim/context']['title'])
+                    })
+                    session.add(group)
+                user.groups.append(group)
             session.add(user)
             await session.commit()
         self.session.clear()
