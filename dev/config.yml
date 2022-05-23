@@ -4,15 +4,15 @@ server:
   host: '0.0.0.0'
   cookie_secret: ohqu6aegezie9uuChidf9shuisahsiegiej4Quo9aiK3Ohhe8aisoimig4Bee9Eb
 lti:
-  - iss: http://localhost:8080
-    client_id: CimhZyC7XXJDfYo
-    auth_login_url: http://localhost:8080/mod/lti/auth.php
-    auth_token_url: http://localhost:8080/mod/lti/token.php
-    key_set_url: http://localhost:8080/mod/lti/certs.php
+  - iss: http://localhost
+    client_id: 4T1yzvAkrXm3ro7
+    auth_login_url: http://localhost/mod/lti/auth.php
+    auth_token_url: http://localhost/mod/lti/token.php
+    key_set_url: http://localhost/mod/lti/certs.php
     private_key_file: private.pem
     public_key_file: public.pem
     deployment_ids:
-      - '2'
+      - '1'
 debug: True
 logging:
   version: 1

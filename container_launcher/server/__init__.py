@@ -4,7 +4,7 @@ import logging
 from tornado.web import Application, RedirectHandler
 from tornado.ioloop import IOLoop
 
-from .handlers import (FrontendHandler, LtiLoginStartHandler, LtiLaunchHandler)
+from .handlers import (FrontendHandler, LtiLoginStartHandler, LtiLaunchHandler, ApiHandler)
 
 from ..utils import config
 
@@ -18,6 +18,7 @@ def run_application_server() -> None:
     routes = [
         ('/', RedirectHandler, {'permanent': False, 'url': '/app'}),
         ('/app(.*)', FrontendHandler),
+        ('/api', ApiHandler),
         ('/lti', LtiLaunchHandler),
         ('/lti/login', LtiLoginStartHandler),
     ]

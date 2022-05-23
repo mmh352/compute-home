@@ -219,7 +219,7 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
             user = result.scalars().first()
             if user is None:
                 logger.debug('Creating a new user')
-                user = User(external_id=str(data['sub']), attributes={})
+                user = User(external_id=str(data['sub']), attributes={}, groups=[])
                 session.add(user)
                 await session.commit()
             user.attributes['name'] = str(data['name'])

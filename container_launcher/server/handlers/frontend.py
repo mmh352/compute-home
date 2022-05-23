@@ -22,7 +22,7 @@ class FrontendHandler(RequestHandler):
         self.xsrf_token
         if not path.strip():
             path = '/'
-        base = resources.files('compute_home')
+        base = resources.files('container_launcher')
         public = base / 'server' / 'frontend' / 'public'
         try:
             logger.debug(f'Attempting to send {path}')

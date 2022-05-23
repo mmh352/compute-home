@@ -17,24 +17,6 @@ services:
       MARIADB_DATABASE: moodle
     volumes:
       - mariadb:/var/lib/mysql
-  moodle:
-    image: bitnami/moodle:4
-    environment:
-      MOODLE_DATABASE_HOST: mariadb
-      MOODLE_DATABASE_PORT_NUMBER: 3306
-      MOODLE_DATABASE_USER: root
-      MOODLE_DATABASE_NAME: moodle
-      MOODLE_DATABASE_PASSWORD: ahph3Ooshaicha7u
-      MOODLE_HOST: localhost
-    ports:
-     - "127.0.0.1:8080:8080"
-    volumes:
-      - moodle_data:/bitnami/moodle
-      - moodledata_data:/bitnami/moodledata
-    depends_on:
-      - mariadb
 volumes:
   postgresql:
   mariadb:
-  moodle_data:
-  moodledata_data:
