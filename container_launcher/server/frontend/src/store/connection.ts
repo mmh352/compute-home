@@ -4,6 +4,8 @@ const INITIAL = 0;
 const CONNECTING = 1;
 const CONNECTED = 2;
 const DISCONNECTED = 5;
+const SHUTDOWN = 6;
+
 export const message = writable({} as ApiMessage);
 export const connectionStatus = writable(INITIAL);
 let connection = null;
@@ -21,7 +23,9 @@ export function connect() {
             message.set({'type': 'connected'});
         });
         connection.addEventListener('close', () => {
-            connectionStatus.set(DISCONNECTED);
+            if (get(connectionStatus) !== SHUTDOWN) {
+                connectionStatus.set(DISCONNECTED);
+            }
             connection = null;
             message.set({'type': 'disconnected'});
         });
@@ -45,8 +49,19 @@ export const isDisconnected = derived(connectionStatus, (status) => {
     return status === DISCONNECTED;
 });
 
+export const isShutDown = derived(connectionStatus, (status) => {
+    return status === SHUTDOWN;
+});
+
 export function sendMessage(message: ApiMessage) {
     if (connection && connection.readyState === 1) {
         connection.send(JSON.stringify(message));
+    }
+}
+
+export function shutdown() {
+    connectionStatus.set(SHUTDOWN);
+    if (connection) {
+        connection.close();
     }
 }

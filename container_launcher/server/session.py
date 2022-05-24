@@ -25,6 +25,12 @@ class Session(object):
         except Exception:
             pass
 
+    def update_cookie(self: 'Session') -> None:
+        """Update the cookie with the session data."""
+        self._handler.set_secure_cookie(config()['server']['session']['name'],
+                                        json.dumps(self._dict),
+                                        expires_days=config()['server']['session']['validity_days'])
+
     def __setitem__(self: 'Session', key: str, value: str) -> None:
         """Set a session value.
 
@@ -34,9 +40,7 @@ class Session(object):
         :type value: str
         """
         self._dict[key] = value
-        self._handler.set_secure_cookie(config()['server']['session']['name'],
-                                        json.dumps(self._dict),
-                                        expires_days=config()['server']['session']['validity_days'])
+        self.update_cookie()
 
     def __getitem__(self: 'Session', key: str) -> str:
         """Get a session value.
@@ -62,6 +66,15 @@ class Session(object):
         """Return an iterator over the session values."""
         return iter(self._dict)
 
+    def __delitem__(self: 'Session', key: str) -> None:
+        """Delete the session entry with the given key.
+
+        :param key: The name of the value to delete.
+        :type key: str
+        """
+        del self._dict[key]
+        self.update_cookie()
+
     def get(self: 'Session', key: str, default: str = None) -> str:
         """Get a session value with a default.
 
@@ -80,9 +93,7 @@ class Session(object):
     def clear(self: 'Session') -> None:
         """Clear the session."""
         self._dict = {}
-        self._handler.set_secure_cookie(config()['server']['session']['name'],
-                                        json.dumps(self._dict),
-                                        expires_days=config()['server']['session']['validity_days'])
+        self.update_cookie()
 
 
 class SessionMixin(object):

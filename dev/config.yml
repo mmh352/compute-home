@@ -1,3 +1,24 @@
+app:
+  title: Open Compute Lab
+  vle:
+    url: http://localhost
+  containers:
+    - name: tt284-block1-21j
+      title: TT284 21J - Block 1
+      description: |
+        Virtual computing environment for Block 1 of TT284 (21J).
+      host: http://localhost:8080/
+      groups:
+        - "2"
+    - name: s397_22j
+      title: S397 22J
+      description: |
+        Access the Genie Earth Simulation environment for block 4
+        of  S397. This will allow you to run the simulations both
+        when working through the module materials and for the TMA.
+      host: http://localhost:8080/
+      groups:
+        - "2"
 database:
   dsn: postgresql+asyncpg://ch:yahmunguaMiep0ie@127.0.0.1:5432/ch
 server:
@@ -17,9 +38,9 @@ debug: True
 logging:
   version: 1
   loggers:
-    compute_home:
+    container_launcher:
       level: DEBUG
-      qualname: compute_home
+      qualname: container_launcher
       handlers:
         - console
   formatters:

@@ -17,6 +17,64 @@ from ..utils import set_config
 logger = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = {
+    'app': {
+        'type': 'dict',
+        'required': True,
+        'schema': {
+            'title': {
+                'type': 'string',
+                'default': 'Container Launcher'
+            },
+            'vle': {
+                'type': 'dict',
+                'default': {
+                    'url': '',
+                },
+                'schema': {
+                    'url': {
+                        'type': 'string',
+                        'default': '',
+                        'empty': True
+                    }
+                }
+            },
+            'containers': {
+                'type': 'list',
+                'default': [],
+                'schema': {
+                    'type': 'dict',
+                    'schema': {
+                        'name': {
+                            'type': 'string',
+                            'required': True,
+                            'empty': False,
+                        },
+                        'title': {
+                            'type': 'string',
+                            'required': True,
+                            'empty': False,
+                        },
+                        'description': {
+                            'type': 'string',
+                            'default': '',
+                        },
+                        'host': {
+                            'type': 'string',
+                            'required': True,
+                            'empty': False,
+                        },
+                        'groups': {
+                            'type': 'list',
+                            'default': [],
+                            'schema': {
+                                'type': 'string'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
     'server': {
         'type': 'dict',
         'required': True,

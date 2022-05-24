@@ -212,16 +212,16 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
         data = message_launch.get_launch_data()
         logger.debug(data)
         logger.debug('Logging in user')
-        async with get_sessionmaker()() as session:
+        async with get_sessionmaker()() as dbsession:
             # Find or create the user to log in
             stmt = select(User).options(selectinload(User.groups)).filter(User.external_id == str(data['sub']))
-            result = await session.execute(stmt)
+            result = await dbsession.execute(stmt)
             user = result.scalars().first()
             if user is None:
                 logger.debug('Creating a new user')
                 user = User(external_id=str(data['sub']), attributes={}, groups=[])
-                session.add(user)
-                await session.commit()
+                dbsession.add(user)
+                await dbsession.commit()
             user.attributes['name'] = str(data['name'])
             # Find or create the group the user belongs to
             group_found = False
@@ -231,16 +231,16 @@ class LtiLaunchHandler(RequestHandler, SessionMixin):
                     group_found = True
             if not group_found:
                 stmt = select(Group).filter(Group.external_id == external_group_id)
-                result = await session.execute(stmt)
+                result = await dbsession.execute(stmt)
                 group = result.scalars().first()
                 if group is None:
                     group = Group(external_id=external_group_id, attributes={
                         'label': str(data['https://purl.imsglobal.org/spec/lti/claim/context']['title'])
                     })
-                    session.add(group)
+                    dbsession.add(group)
                 user.groups.append(group)
-            session.add(user)
-            await session.commit()
+            dbsession.add(user)
+            await dbsession.commit()
         self.session.clear()
         self.session['user_id'] = user.id
         self.redirect('/app')

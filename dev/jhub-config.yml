@@ -1,0 +1,214 @@
+cull:
+  enabled: true
+  timeout: 600
+  every: 60
+
+prePuller:
+  hook:
+    enabled: false
+
+ingress:
+    enabled: true
+    hosts:
+      - jhub
+
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: nativeauthenticator.NativeAuthenticator
+  extraConfig:
+    authentication.py: |
+      c.Authenticator.admin_users = {'mmh352'}
+    shutdown.py: |
+      c.JupyterHub.shutdown_on_logout = True
+    timeout.py: |
+      c.KubeSpawner.start_timeout = 60 * 5
+      c.KubeSpawner.http_timeout = 120
+  extraEnv:
+    JUPYTERHUB_CRYPT_KEY: a50fb22fdeb90f907832c005adc0b260af27874d51f944501e16dde4596f7896
+  networkPolicy:
+    allowedIngressPorts:
+      - 8081
+      - 8181
+  service:
+    extraPorts:
+      - port: 8181
+        targetPort: 8181
+        name: ou-jupyterhub
+
+singleuser:
+  image:
+    name: mmh352/demo-21j
+    tag: latest
+  profileList:
+    - display_name: TT284 Block 1 (21J)
+      slug: tt284-block1-21j
+      description: Practical Exercises for TT284, Block 1
+      kubespawner_override:
+        image: mmh352/tt284-block1:21j.4-b3
+        cpu_limit: .5
+        cpu_guarantee: .1
+        mem_limit: 0.5G
+        mem_guarantee: 0.5G
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+      allow:
+        - tt284
+    - display_name: TT284 Block 2 (21J)
+      slug: tt284-block2-21j
+      description: Practical Exercises for TT284, Block 2
+      kubespawner_override:
+        image: mmh352/tt284-block2:21j.4-b3
+        cpu_limit: .5
+        cpu_guarantee: .1
+        mem_limit: 0.5G
+        mem_guarantee: 0.5G
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+      allow:
+        - tt284
+    - display_name: TT284 Block 3 (21J)
+      slug: tt284-block3-21j
+      description: Practical Exercises for TT284, Block 3
+      kubespawner_override:
+        image: mmh352/tt284-block3:21j.4-b3
+        cpu_limit: .5
+        cpu_guarantee: .1
+        mem_limit: 0.5G
+        mem_guarantee: 0.5G
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+      allow:
+        - tt284
+    - display_name: TM129 Robotics (21J)
+      slug: tm129-robotics-21j
+      description: Practical Exercises for TM129 21J
+      kubespawner_override:
+        image: mmh352/tm129-robotics
+        tag: 21j.0
+        cpu_limit: 2
+        cpu_guarantee: 0.8
+        memory_limit: 3G
+        memory_guarantee: 3G
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+      allow:
+        - tm129
+    - display_name: TM129 Robotics (22B)
+      slug: tm129-robotics-22b
+      description: Practical Exercises for TM129 22B
+      kubespawner_override:
+        image: mmh352/tm129-robotics
+        tag: 22b.3
+        cpu_limit: 2
+        cpu_guarantee: 0.8
+        memory_limit: 3G
+        memory_guarantee: 3G
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+      allow:
+        - tm129
+    - display_name: S397
+      slug: s397-21j
+      description: Genie Earth Simulation for S397
+      kubespawner_override:
+        image: mmh352/s397-21j:2
+        cpu_limit: 2
+        cpu_guarantee: .6
+        mem_limit: 1.5G
+        mem_guarantee: 1.5G
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+      allow:
+        - s397
+    - display_name: Metadata Tutorial
+      slug: metadata-tutorial
+      description: The DhD AG ZZ Metadata Tutorial
+      kubespawner_override:
+        image: mmh352/metadatatutorial-2:latest
+        cpu_limit: 1
+        cpu_guarantee: .4
+        mem_limit: 0.5G
+        mem_guarantee: 0.5G
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+    - display_name: Jupyter Notebook
+      slug: jupyter-notebook
+      description: A bare-bones Jupyter Notebook
+      default: true
+      kubespawner_override:
+        tolerations:
+          - key: open.ac.uk/module-test
+            operator: Equal
+            value: user
+            effect: NoSchedule
+          - key: hub.jupyter.org/dedicated
+            operator: Equal
+            value: user
+            effect: NoSchedule
+
+
+  storage:
+    capacity: 1Gi
+    dynamic:
+      storageClass: local-path
+    homeMountPath: /home/ou
+
+  memory:
+    limit: 1G
+    guarantee: 1G
+  cpu:
+    limit: .2
+    guarantee: .1
+  extraEnv:
+    JUPYTER_RUNTIME_DIR: "/tmp"
+  cmd:
