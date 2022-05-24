@@ -34,6 +34,7 @@ const unsubscribeMessage = message.subscribe((msg) => {
     } else if (msg.type === 'config') {
         activity.complete('config', true);
         config.set(msg.config);
+        document.title = msg.config.title;
     } else if (msg.type === 'user') {
         activity.start('container', 'Fetching available virtual computing environments...');
         sendMessage({type: 'request-containers'});
